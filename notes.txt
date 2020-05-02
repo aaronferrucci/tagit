@@ -1,0 +1,29 @@
+Each podcast file needs three tags:
+TCON: Podcast
+TALB: podcast name, e.g. "Pod Save America"
+TIT2: episode title, e.g. "Trump's Grand Opening"
+
+id3v2 --TCON Podcast *.mp3
+
+"Planet Money" acts weird: each episode appears in its own "Planet Money"
+folder on the watch. I don't see any tag reason why this should be so.
+silly experiment: remove the '#' character from the episode title: 
+
+01_398_Unsheltered_in_Place_pt01.mp3
+tags:
+TIT2: 398- Unsheltered in Place pt01
+TPE1: Roman Mars
+Q: with no TCON=Podcast, why does it end up under podcasts?
+Q: did the watch fall back on TPE1 for the podcast name (no TALB)?
+
+20200410_pmoney_episode_update-ffc52ddf-501e-459e-bc55-a13f52a1e948.mp3_49514dac961005ae4e6dfe81c45ee225_21990369.mp3
+tags:
+none!
+
+
+DGT8611120474.mp3
+tags:
+TCON: Podcast (255)
+TALB: Pod Save America
+TIT2: "Trump's Grand Opening"
+
