@@ -93,5 +93,6 @@ print "clean:\n";
 for my $podcast (sort keys %db) {
   print map {"\trm -f \"$_\"\n"} (sort @{$db{$podcast}});
 }
+print "\trm Makefile\n";
 print "\n";
 
