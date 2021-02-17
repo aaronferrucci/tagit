@@ -40,7 +40,8 @@ my %titles;
         my $mp3file = "$dir/$episode";
         my $mp3 = MP3::Tag->new($mp3file);
         $mp3->get_tags;
-        $titles{$episode} = $mp3->{ID3v2}->get_frame("TIT2") || "";
+        $titles{$episode} =
+          $mp3->{ID3v2} && $mp3->{ID3v2}->get_frame("TIT2") || "";
       }
     }
   }
