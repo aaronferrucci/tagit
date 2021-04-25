@@ -1,3 +1,4 @@
 *.mp3
 .*.swp
 Makefile
+MP3-Tag-*
