@@ -1,12 +1,6 @@
 use strict;
 use warnings;
-
-sub open_or_die($)
-{
-  my $dir = shift;  
-  opendir my $DH, $dir or die "Can't open directory '$dir'";
-  return $DH;
-}
+use tagit;
 
 my $podcastbase = "$ENV{HOME}/Music";
 
@@ -47,38 +41,50 @@ my %titles;
   }
 }
 
-print ".PHONY: all\n";
-print "all: cp TALB TCON\n";
-print "\n";
+print << 'EOT';
+.PHONY: all
+all: cp TALB TCON
 
-print "# copy files\n";
-print ".PHONY: cp\n";
-print "cp:\n";
+EOT
+
+print << 'EOT';
+# copy files
+.PHONY: cp
+cp:
+EOT
+
 for my $podcast (sort keys %db) {
   my $dir = "$podcastbase/$podcast";
   print map {"\tcp \"$dir/$_\" .\n"} (sort @{$db{$podcast}});
 }
-print "\n";
+print << 'EOT';
 
-print "# set album (TALB)\n";
-print ".PHONY: TALB\n";
-print "TALB:\n";
+# set album (TALB)
+.PHONY: TALB
+TALB:
+EOT
+
 for my $podcast (sort keys %db) {
   print map {"\tid3v2 --TALB \"$podcast\" \"$_\"\n"} (sort @{$db{$podcast}});
 }
-print "\n";
 
-print "# set content type (TCON)\n";
-print ".PHONY: TCON\n";
-print "TCON:\n";
+print << 'EOT';
+
+# set content type (TCON)
+.PHONY: TCON
+TCON:
+EOT
+
 for my $podcast (sort keys %db) {
   print map {"\tid3v2 --TCON Podcast \"$_\"\n"} (sort @{$db{$podcast}});
 }
-print "\n";
+print << 'EOT';
 
-print "# set title (TIT2) - not auto-run, to be manually modified\n";
-print ".PHONY: TIT2\n";
-print "TIT2:\n";
+# set title (TIT2) - not auto-run, to be manually modified
+.PHONY: TIT2
+TIT2:
+EOT
+
 for my $podcast (sort keys %db) {
   for my $episode (sort @{$db{$podcast}}) {
     my $comment = $titles{$episode} ne "" ? "# " : "";
@@ -86,14 +92,21 @@ for my $podcast (sort keys %db) {
     print "\t${comment}id3v2 --TIT2 \"$titles{$episode}\" \"$episode\"\n";
   }
 }
-print "\n";
+# cache TIT2 entries
+print "\tperl tit2.pl >> tit2.cache\n";
 
-print "# clean\n";
-print ".PHONY: clean\n";
-print "clean:\n";
+print << 'EOT';
+
+# clean
+.PHONY: clean
+clean:
+EOT
+
 for my $podcast (sort keys %db) {
   print map {"\trm -f \"$_\"\n"} (sort @{$db{$podcast}});
 }
-print "\trm Makefile\n";
-print "\n";
+print << "EOT";
+\trm Makefile
+EOT
+
 
