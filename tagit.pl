@@ -93,7 +93,7 @@ for my $podcast (sort keys %db) {
   }
 }
 # cache TIT2 entries
-print "\tperl tit2.pl >> tit2.cache\n";
+print "\t./tit2.py\n";
 
 print << 'EOT';
 
