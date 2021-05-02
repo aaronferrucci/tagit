@@ -43,17 +43,23 @@ for d in args.dirs:
     except Exception as e:
       print("file %s got a %s exception (%s), skipping it." % (mp3file, type(e), e))
 
+# merge caches. newcache entries take precedence, because they come from manual
+# entries in the Makefile before running TIT2.
+for r in cache:
+  if r not in newcache:
+    newcache[r] = cache[r]
+
 # if the new cache file is identical to the old one, nothing to do
 if not args.force and cache == newcache:
   print("no new cache entries; not updating cache file %s" % args.cachefile)
   exit(0)
+
 # write cache file
 print("write new cache file %s" % args.cachefile)
 try:
   with open(args.cachefile, 'w') as cachefd:
     for f in sorted(newcache.keys()):
       print("%s: %s" % (f, newcache[f]), file=cachefd)
-      print("%s: %s" % (f, newcache[f]))
 except Exception as e:
   print("opening/writing file %s, got exception %s (%s)." % (args.cachefile, type(e), e))
 
