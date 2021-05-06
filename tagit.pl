@@ -17,6 +17,24 @@ for my $podcast (keys %db) {
   push @{$db{$podcast}}, @mp3s;
 }
 
+# read the cache file, if any
+my $cachefile = 'tit2.cache';
+my %cache;
+if (open(my $cachefd, "<", $cachefile)) {
+  while (my $line = <$cachefd>) {
+    chomp($line);
+    if ($line =~ /(^.*):\s*(.*)$/) {
+      my $file = $1;
+      my $title = $2;
+      $file =~ s|^\./||;
+      $cache{$file} = $title;
+    }
+
+  }
+  close($cachefd)
+
+}
+
 # save each mp3 file's title (TIT2)
 # to do: would it be useful to bundle everything into a single data structure?
 my %titles;
@@ -36,6 +54,14 @@ my %titles;
         $mp3->get_tags;
         $titles{$episode} =
           $mp3->{ID3v2} && $mp3->{ID3v2}->get_frame("TIT2") || "";
+      } else {
+        # use cached title, if found
+        if ($cache{$episode}) {
+          print STDERR "found title for '$episode' in cache, using it\n";
+          $titles{$episode} = $cache{$episode};
+        } else {
+          print STDERR "no title for '$episode' in cache, it's up to you\n";
+        }
       }
     }
   }
