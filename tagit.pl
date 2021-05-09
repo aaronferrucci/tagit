@@ -38,6 +38,7 @@ if (open(my $cachefd, "<", $cachefile)) {
 # save each mp3 file's title (TIT2)
 # to do: would it be useful to bundle everything into a single data structure?
 my %titles;
+my %blacklist;
 {
   use lib('MP3-Tag-1.15/lib');
   use MP3::Tag;
@@ -47,6 +48,7 @@ my %titles;
     my $dir = "$podcastbase/$podcast";
     my $blacklisted = grep {/$podcast/} @blacklist;
     for my $episode (sort @{$db{$podcast}}) {
+      $blacklist{$episode} = $blacklisted;
       $titles{$episode} = "";
       if (!$blacklisted) {
         my $mp3file = "$dir/$episode";
@@ -113,7 +115,12 @@ EOT
 
 for my $podcast (sort keys %db) {
   for my $episode (sort @{$db{$podcast}}) {
-    my $comment = $titles{$episode} ne "" ? "# " : "";
+    # need to update the podcast title if it's blacklisted, or if the
+    # title is empty.
+    # Why update if it's blacklisted but non-empty? The title came from the
+    # cache, and is not in the mp3 file (yet).
+    my $comment = '# ';
+    $comment = "" if $titles{$episode} eq "" or $blacklist{$episode};
 
     print "\t${comment}id3v2 --TIT2 \"$titles{$episode}\" \"$episode\"\n";
   }
