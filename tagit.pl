@@ -43,7 +43,7 @@ my %blacklist;
   use lib('MP3-Tag-1.15/lib');
   use MP3::Tag;
   # blacklisted podcasts with missing or misleading titles
-  my @blacklist = ("On the Media", "Planet Money");
+  my @blacklist = ("ACM ByteCast", "On the Media", "Planet Money");
   for my $podcast (sort keys %db) {
     my $dir = "$podcastbase/$podcast";
     my $blacklisted = grep {/$podcast/} @blacklist;
