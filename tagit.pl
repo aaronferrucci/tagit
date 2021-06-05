@@ -109,6 +109,10 @@ for my $podcast (sort keys %db) {
 print << 'EOT';
 
 # set title (TIT2) - not auto-run, to be manually modified
+# Use venv python
+# Assumption: it's been set up ("python3 -m venv tagit_venv"),
+# and any needed packages have been installed inside it ("pip install eyed3")
+PYTHON := ./tagit_venv/bin/python
 .PHONY: TIT2
 TIT2:
 EOT
@@ -126,7 +130,7 @@ for my $podcast (sort keys %db) {
   }
 }
 # cache TIT2 entries
-print "\t./tit2.py\n";
+print "\t\$(PYTHON) ./tit2.py\n";
 
 print << 'EOT';
 
