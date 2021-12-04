@@ -91,13 +91,15 @@ my $debug_print;
   }
 }
 
-print << 'EOT';
+my $msg = "";
+
+$msg .= << 'EOT';
 .PHONY: all
 all: cp TALB TCON
 
 EOT
 
-print << 'EOT';
+$msg .= << 'EOT';
 # copy files
 .PHONY: cp
 cp:
@@ -105,9 +107,9 @@ EOT
 
 for my $podcast (sort keys %db) {
   my $dir = "$podcastbase/$podcast";
-  print map {"\tcp \"$dir/$_\" .\n"} (sort @{$db{$podcast}});
+  $msg .= join("", map {"\tcp \"$dir/$_\" .\n"} (sort @{$db{$podcast}}));
 }
-print << 'EOT';
+$msg .= << 'EOT';
 
 # set album (TALB)
 .PHONY: TALB
@@ -115,10 +117,10 @@ TALB:
 EOT
 
 for my $podcast (sort keys %db) {
-  print map {"\tid3v2 --TALB \"$podcast\" \"$_\"\n"} (sort @{$db{$podcast}});
+  $msg .= join("", map {"\tid3v2 --TALB \"$podcast\" \"$_\"\n"} (sort @{$db{$podcast}}));
 }
 
-print << 'EOT';
+$msg .= << 'EOT';
 
 # set content type (TCON)
 .PHONY: TCON
@@ -126,9 +128,14 @@ TCON:
 EOT
 
 for my $podcast (sort keys %db) {
-  print map {"\tid3v2 --TCON Podcast \"$_\"\n"} (sort @{$db{$podcast}});
+  $msg .= join("", map {"\tid3v2 --TCON Podcast \"$_\"\n"} (sort @{$db{$podcast}}));
 }
-print << 'EOT';
+
+my $tit2_inc = "tit2.mk";
+$msg .= "\ninclude $tit2_inc\n";
+
+my $msg2 = "";
+$msg2 .= << 'EOT';
 
 # set title (TIT2) - not auto-run, to be manually modified
 # Use venv python
@@ -148,13 +155,13 @@ for my $podcast (sort keys %db) {
     my $comment = '# ';
     $comment = "" if $titles{$episode} eq "" or $blacklist{$episode};
 
-    print "\t${comment}id3v2 --TIT2 \"$titles{$episode}\" \"$episode\"\n";
+    $msg2 .= "\t${comment}id3v2 --TIT2 \"$titles{$episode}\" \"$episode\"\n";
   }
 }
 # cache TIT2 entries
-print "\t\$(PYTHON) ./tit2.py\n";
+$msg2 .= "\t\$(PYTHON) ./tit2.py\n";
 
-print << 'EOT';
+$msg .= << 'EOT';
 
 # clean
 .PHONY: clean
@@ -162,10 +169,18 @@ clean:
 EOT
 
 for my $podcast (sort keys %db) {
-  print map {"\trm -f \"$_\"\n"} (sort @{$db{$podcast}});
+  $msg .= join("", map {"\trm -f \"$_\"\n"} (sort @{$db{$podcast}}));
 }
-print << "EOT";
+$msg .= << "EOT";
+\trm $tit2_inc
 \trm Makefile
 EOT
 
+my $filename = 'Makefile';
+open(my $fh, '>', $filename);
+print $fh $msg;
+close($fh);
 
+open(my $fh, '>', $tit2_inc);
+print $fh $msg2;
+close($fh);

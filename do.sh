@@ -1,4 +1,4 @@
 #!/bin/bash
 make clean
-perl -I `pwd` tagit.pl > Makefile
+perl -I `pwd` tagit.pl
 make
