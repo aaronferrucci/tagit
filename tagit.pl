@@ -26,24 +26,41 @@ if (open(my $cachefd, "<", $cachefile)) {
     if ($line =~ /(^.*):\s*(.*)$/) {
       my $file = $1;
       my $title = $2;
+      # get rid of any leading './'
       $file =~ s|^\./||;
       $cache{$file} = $title;
     }
 
   }
   close($cachefd)
-
 }
+
+sub print_cache($)
+{
+  my %cache = %{shift()};
+
+  # debug: print the cache
+  print STDERR "\n#####\ncache:\n";
+  for my $title (sort keys %cache) {
+    if ($title =~ /20210616_indicator_housing_ready_to_publish.mp3_b2a4d5ed9f3f1a8ee6bc1364dcada9ef_9475212.mp3/) {
+      print STDERR "founding _housing_: $title: $cache{$title}\n";
+    }
+  }
+  print STDERR "#####\n\n";
+}
+
+print_cache(\%cache);
 
 # save each mp3 file's title (TIT2)
 # to do: would it be useful to bundle everything into a single data structure?
 my %titles;
 my %blacklist;
+my $debug_print;
 {
   use lib('MP3-Tag-1.15/lib');
   use MP3::Tag;
   # blacklisted podcasts with missing or misleading titles
-  my @blacklist = ("ACM ByteCast", "On the Media", "Planet Money");
+  my @blacklist = ("ACM ByteCast", "On the Media", "Planet Money", "The Indicator from Planet Money");
   for my $podcast (sort keys %db) {
     my $dir = "$podcastbase/$podcast";
     my $blacklisted = grep {/$podcast/} @blacklist;
@@ -58,11 +75,16 @@ my %blacklist;
           $mp3->{ID3v2} && $mp3->{ID3v2}->get_frame("TIT2") || "";
       } else {
         # use cached title, if found
+        print STDERR "cached value for episode '$episode': '$cache{$episode}'\n";
         if ($cache{$episode}) {
           print STDERR "found title for '$episode' in cache, using it\n";
           $titles{$episode} = $cache{$episode};
         } else {
           print STDERR "no title for '$episode' in cache, it's up to you\n";
+          if (not $debug_print) {
+            print_cache(\%cache);
+          }
+
         }
       }
     }
