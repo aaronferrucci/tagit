@@ -2,6 +2,18 @@ use strict;
 use warnings;
 use tagit;
 
+sub print_cache($)
+{
+  my %cache = %{shift()};
+
+  # debug: print the cache
+  print STDERR "\n#####\ncache:\n";
+  for my $title (sort keys %cache) {
+    print STDERR "'$title': '$cache{$title}'\n";
+  }
+  print STDERR "#####\n\n";
+}
+
 my $podcastbase = "$ENV{HOME}/Music";
 
 my $dir = open_or_die($podcastbase);
@@ -23,7 +35,7 @@ my %cache;
 if (open(my $cachefd, "<", $cachefile)) {
   while (my $line = <$cachefd>) {
     chomp($line);
-    if ($line =~ /(^.*):\s*(.*)$/) {
+    if ($line =~ /(^[^:]*):\s*(.*)$/) {
       my $file = $1;
       my $title = $2;
       # get rid of any leading './'
@@ -34,22 +46,7 @@ if (open(my $cachefd, "<", $cachefile)) {
   }
   close($cachefd)
 }
-
-sub print_cache($)
-{
-  my %cache = %{shift()};
-
-  # debug: print the cache
-  print STDERR "\n#####\ncache:\n";
-  for my $title (sort keys %cache) {
-    if ($title =~ /20210616_indicator_housing_ready_to_publish.mp3_b2a4d5ed9f3f1a8ee6bc1364dcada9ef_9475212.mp3/) {
-      print STDERR "founding _housing_: $title: $cache{$title}\n";
-    }
-  }
-  print STDERR "#####\n\n";
-}
-
-print_cache(\%cache);
+# print_cache(\%cache);
 
 # save each mp3 file's title (TIT2)
 # to do: would it be useful to bundle everything into a single data structure?
@@ -60,7 +57,7 @@ my $debug_print;
   use lib('MP3-Tag-1.15/lib');
   use MP3::Tag;
   # blacklisted podcasts with missing or misleading titles
-  my @blacklist = ("ACM ByteCast", "On the Media", "Planet Money", "The Indicator from Planet Money");
+  my @blacklist = ("ACM ByteCast", "Freakonomics Radio", "On the Media", "Planet Money", "The Indicator from Planet Money", "What Bitcoin Did");
   for my $podcast (sort keys %db) {
     my $dir = "$podcastbase/$podcast";
     my $blacklisted = grep {/$podcast/} @blacklist;
@@ -181,6 +178,6 @@ open(my $fh, '>', $filename);
 print $fh $msg;
 close($fh);
 
-open(my $fh, '>', $tit2_inc);
+open($fh, '>', $tit2_inc);
 print $fh $msg2;
 close($fh);
