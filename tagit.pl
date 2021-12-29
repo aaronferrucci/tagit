@@ -92,7 +92,7 @@ my $msg = "";
 
 $msg .= << 'EOT';
 .PHONY: all
-all: cp TALB TCON
+all: cp TALB TCON TIT2
 
 EOT
 

@@ -12,13 +12,16 @@ db = os.path.join(
 tree = ET.parse(db)
 
 root = tree.getroot()
+print(".PHONY: TIT2")
+print("TIT2:")
+print("\ttrue")
 for entry in root.findall('./entry'):
   hidden = entry.find('hidden')
-  if hidden != None and hidden.text.encode('utf8') == b'1':
+  if hidden != None and hidden.text == '1':
     continue
-  location = entry.find('location').text.encode('utf8')
-  if location.startswith(b'file:///'):
-    title = entry.find('title').text.encode('utf8')
-    print(title)
-    print(location)
-    print()
+  location = entry.find('location').text
+  if location.startswith('file:///'):
+    the_file = os.path.basename(location)
+    title = entry.find('title').text
+    print("\t[ -f %s ]" % (the_file))
+    print("\tid3v2 --TIT2 \"%s\" \"%s\"" % (title, the_file))
