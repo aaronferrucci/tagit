@@ -128,6 +128,21 @@ for my $podcast (sort keys %db) {
   $msg .= join("", map {"\tid3v2 --TCON Podcast \"$_\"\n"} (sort @{$db{$podcast}}));
 }
 
+# 'deploy' (copy podcasts into subdirectories)
+# some podcasts need this treatment lest they show up as one
+# directory per episode on the garmin watch
+# experimentally determined, manually implemented here.
+$msg .= << 'EOT';
+.PHONY: deploy
+deploy:
+	mkdir -p 'Planet Money'
+	-mv *pmoney* 'Planet Money'
+	mkdir -p WBD
+	-mv WBD?* WBD
+	mkdir -p 'The Indicator'
+	-mv *indic* 'The Indicator'
+EOT
+
 my $tit2_inc = "tit2.mk";
 $msg .= "\ninclude $tit2_inc\n";
 
