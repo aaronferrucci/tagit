@@ -138,7 +138,7 @@ deploy:
 	mkdir -p 'Planet Money'
 	-mv *pmoney* 'Planet Money'
 	mkdir -p WBD
-	-mv WBD?* WBD
+	-mv _WBD?* WBD?* WBD
 	mkdir -p 'The Indicator'
 	-mv *indic* 'The Indicator'
 EOT
